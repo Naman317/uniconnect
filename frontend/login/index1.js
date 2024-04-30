@@ -1,87 +1,35 @@
 // Sidebar
 const menuItems = document.querySelectorAll('.menu-item');
 
+// Define the showPostsOnFrontend function
+// function showPostsOnFrontend(postId) {
+//     // Fetch the newly created post using the postId
+//     fetch(`/api/posts/${postId}`)
+//         .then(response => response.json())
+//         .then(data => {
+//             // Assuming data contains the details of the new post
+//             const { caption, imageUrl, user } = data.post;
+
+//             // Create HTML elements to display the new post
+//             const postElement = document.createElement('div');
+//             postElement.innerHTML = `
+//                 <h3>${caption}</h3>
+//                 <p>Posted by: ${user.username}</p>
+//                 <img src="${imageUrl}" alt="Post Image">
+//                 <button onclick="likePost('${postId}')">Like</button>
+//                 <button onclick="commentOnPost('${postId}')">Comment</button>
+//             `;
+
+//             // Assuming postsContainer is the container element for all posts
+//             const postsContainer = document.getElementById('posts-container');
+//             // Append the new post to the container
+//             postsContainer.appendChild(postElement);
+//         })
+//         .catch(error => console.error('Error fetching new post:', error));
+// }
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to handle liking a post
-    function likePost(postId) {
-        // Send a POST request to the server to like the post
-        fetch(`/api/post/like/${postId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to like the post");
-            }
-            // If successful, update the UI
-            updateLikes(postId);
-        })
-        .catch((error) => {
-            console.error("Error liking post:", error);
-        });
-    }
 
-    // Function to handle disliking a post
-    function dislikePost(postId) {
-        // Send a POST request to the server to dislike the post
-        fetch(`/api/post/dislike/${postId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to dislike the post");
-            }
-            // If successful, update the UI
-            updateLikes(postId);
-        })
-        .catch((error) => {
-            console.error("Error disliking post:", error);
-        });
-    }
-
-    // Function to update the like count in the UI
-    function updateLikes(postId) {
-        // Fetch the updated like count from the server
-        fetch(`/api/post/${postId}`)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch post details");
-            }
-            return response.json();
-        })
-        .then((postData) => {
-            // Update the like count in the UI
-            const likeCountElement = document.getElementById(`like-count-${postId}`);
-            likeCountElement.textContent = postData.likes.length;
-        })
-        .catch((error) => {
-            console.error("Error updating like count:", error);
-        });
-    }
-
-    // Attach event listeners to like and dislike buttons
-    document.querySelectorAll(".like-btn").forEach((btn) => {
-        btn.addEventListener("click", function (event) {
-            const postId = event.target.dataset.postId;
-            likePost(postId);
-        });
-    });
-
-    document.querySelectorAll(".dislike-btn").forEach((btn) => {
-        btn.addEventListener("click", function (event) {
-            const postId = event.target.dataset.postId;
-            dislikePost(postId);
-        });
-    });
-});
-// JavaScript to handle form submission
 document.addEventListener('DOMContentLoaded', () => {
     const createPostForm = document.querySelector('.create-post');
 
@@ -91,25 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get form data
         const content = document.getElementById('create-post-content').value;
         const image = document.getElementById('image-upload').files[0];
-
-        // Perform client-side validation to check if an image file is selected
-        if (!image) {
-            console.error('Image file not provided');
-            return; // Exit the function if no image file is selected
-        }
+        const formData = new FormData();
+        formData.append('caption', content);
+        formData.append('image', image);
 
         try {
-            const formData = new FormData();
-            formData.append('caption', content);
-            formData.append('image', image);
-
             const response = await fetch('/api/post/create', {
                 method: 'POST',
                 body: formData,
-                // Ensure correct form data formatting
-                headers: {
-                    'Accept': 'application/json',
-                }
             });
 
             if (!response.ok) {
@@ -126,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logout-button');
